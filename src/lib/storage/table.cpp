@@ -48,7 +48,7 @@ void Table::create_new_chunk() {
     resolve_data_type(_column_types[index], [&](const auto data_type_t) {
       using ColumnDataType = typename decltype(data_type_t)::type;
       const auto value_segment = std::make_shared<ValueSegment<ColumnDataType>>();
-      chunks.back()->add_segment(value_segment);
+      _chunks.back()->add_segment(value_segment);
     });
   }
 }
@@ -97,13 +97,13 @@ const std::string& Table::column_type(const ColumnID column_id) const {
 }
 
 Chunk& Table::get_chunk(ChunkID chunk_id) {
-  DebugAssert(chunk_id < chunks.size(), "The requested chunk_id has no corresponding chunk inside the table!");
+  DebugAssert(chunk_id < _chunks.size(), "The requested chunk_id has no corresponding chunk inside the table!");
 
   return *_chunks[chunk_id];
 }
 
 const Chunk& Table::get_chunk(ChunkID chunk_id) const {
-  DebugAssert(chunk_id < chunks.size(), "The requested chunk_id has no corresponding chunk inside the table!");
+  DebugAssert(chunk_id < _chunks.size(), "The requested chunk_id has no corresponding chunk inside the table!");
 
   return *_chunks[chunk_id];
 }
