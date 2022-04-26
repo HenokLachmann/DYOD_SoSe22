@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -44,7 +45,7 @@ class StorageManager : private Noncopyable {
   StorageManager() {}
   StorageManager& operator=(StorageManager&&) = default;
 
-  // Implementation goes here
+  std::map<std::string, std::shared_ptr<Table>> _tables{};
 };
 
 }  // namespace opossum
