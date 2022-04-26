@@ -24,7 +24,7 @@ void Table::add_column(const std::string& name, const std::string& type) {
   _column_names.push_back(name);
   _column_types.push_back(type);
 
-  for (const auto& chunk : chunks) {
+  for (const auto& chunk : _chunks) {
     resolve_data_type(_column_types.back(), [&](const auto data_type_t) {
       using ColumnDataType = typename decltype(data_type_t)::type;
       const auto value_segment = std::make_shared<ValueSegment<ColumnDataType>>();
@@ -34,15 +34,15 @@ void Table::add_column(const std::string& name, const std::string& type) {
 }
 
 void Table::append(const std::vector<AllTypeVariant>& values) {
-  if (chunks.back()->size() >= target_chunk_size()) {
+  if (_chunks.back()->size() >= target_chunk_size()) {
     create_new_chunk();
   }
 
-  chunks.back()->append(values);
+  _chunks.back()->append(values);
 }
 
 void Table::create_new_chunk() {
-  chunks.push_back(std::make_shared<Chunk>());
+  _chunks.push_back(std::make_shared<Chunk>());
 
   for (auto index = 0; index < column_count(); index++) {
     resolve_data_type(_column_types[index], [&](const auto data_type_t) {
@@ -58,14 +58,14 @@ ColumnCount Table::column_count() const { return static_cast<ColumnCount>(_colum
 ChunkOffset Table::row_count() const {
   auto row_number = 0;
 
-  for (const auto& chunk : chunks) {
+  for (const auto& chunk : _chunks) {
     row_number += chunk->size();
   }
 
   return row_number;
 }
 
-ChunkID Table::chunk_count() const { return static_cast<ChunkID>(chunks.size()); }
+ChunkID Table::chunk_count() const { return static_cast<ChunkID>(_chunks.size()); }
 
 ColumnID Table::column_id_by_name(const std::string& column_name) const {
   for (auto index = 0; index < column_count(); index++) {
@@ -99,13 +99,13 @@ const std::string& Table::column_type(const ColumnID column_id) const {
 Chunk& Table::get_chunk(ChunkID chunk_id) {
   DebugAssert(chunk_id < chunks.size(), "The requested chunk_id has no corresponding chunk inside the table!");
 
-  return *chunks[chunk_id];
+  return *_chunks[chunk_id];
 }
 
 const Chunk& Table::get_chunk(ChunkID chunk_id) const {
   DebugAssert(chunk_id < chunks.size(), "The requested chunk_id has no corresponding chunk inside the table!");
 
-  return *chunks[chunk_id];
+  return *_chunks[chunk_id];
 }
 
 void Table::compress_chunk(const ChunkID chunk_id) {
