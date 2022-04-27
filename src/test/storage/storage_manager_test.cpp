@@ -62,11 +62,11 @@ TEST_F(StorageStorageManagerTest, PrintTableInfo) {
   std::ostringstream oss{};
   storage_manager.print(oss);
 
-  EXPECT_TRUE(oss.str().find("Name: first_table") != std::string::npos);
-  EXPECT_TRUE(oss.str().find("# Columns: 0") != std::string::npos);
-  EXPECT_TRUE(oss.str().find("# Rows: 0") != std::string::npos);
+  EXPECT_NE(oss.str().find("Name: first_table"), std::string::npos);
+  EXPECT_NE(oss.str().find("# Columns: 0"), std::string::npos);
+  EXPECT_NE(oss.str().find("# Rows: 0"), std::string::npos);
   // Even empty tables contain one chunk of data.
-  EXPECT_TRUE(oss.str().find("# Chunks: 1") != std::string::npos);
+  EXPECT_NE(oss.str().find("# Chunks: 1"), std::string::npos);
 }
 
 }  // namespace opossum
