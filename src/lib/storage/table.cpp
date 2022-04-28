@@ -96,13 +96,13 @@ const std::string& Table::column_type(const ColumnID column_id) const {
   return _column_types[column_id];
 }
 
-Chunk& Table::get_chunk(ChunkID chunk_id) {
+std::shared_ptr<Chunk> Table::get_chunk(ChunkID chunk_id) {
   DebugAssert(chunk_id < _chunks.size(), "The requested chunk_id has no corresponding chunk inside the table!");
 
   return *_chunks[chunk_id];
 }
 
-const Chunk& Table::get_chunk(ChunkID chunk_id) const {
+std::shared_ptr<const Chunk> Table::get_chunk(ChunkID chunk_id) const {
   DebugAssert(chunk_id < _chunks.size(), "The requested chunk_id has no corresponding chunk inside the table!");
 
   return *_chunks[chunk_id];
