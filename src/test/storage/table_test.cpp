@@ -49,8 +49,8 @@ TEST_F(StorageTableTest, ConstGetChunk) {
   table.get_chunk(ChunkID{1});
 
   const auto& const_table = table;
-  const Chunk& chunk = const_table.get_chunk(ChunkID{0});
-  EXPECT_EQ(chunk.size(), 2);
+  const auto chunk = const_table.get_chunk(ChunkID{0});
+  EXPECT_EQ(chunk->size(), 2);
   EXPECT_THROW(table.get_chunk(ChunkID{7}), std::exception);
 }
 
