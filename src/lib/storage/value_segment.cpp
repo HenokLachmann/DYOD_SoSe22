@@ -14,9 +14,7 @@ namespace opossum {
 
 template <typename T>
 AllTypeVariant ValueSegment<T>::operator[](const ChunkOffset chunk_offset) const {
-  DebugAssert(chunk_offset < _values.size(), "The requested chunk_offset is out of range!");
-
-  return _values[chunk_offset];
+  return _values.at(chunk_offset);
 }
 
 template <typename T>
@@ -36,7 +34,7 @@ const std::vector<T>& ValueSegment<T>::values() const {
 
 template <typename T>
 size_t ValueSegment<T>::estimate_memory_usage() const {
-  return size() * sizeof(T);
+  return _values.capacity() * sizeof(T);
 }
 
 // Macro to instantiate the following classes:

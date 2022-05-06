@@ -44,7 +44,8 @@ void Table::append(const std::vector<AllTypeVariant>& values) {
 void Table::create_new_chunk() {
   _chunks.push_back(std::make_shared<Chunk>());
 
-  for (auto index = 0; index < column_count(); index++) {
+  const auto num_cols = column_count();
+  for (auto index = 0; index < num_cols; index++) {
     resolve_data_type(_column_types[index], [&](const auto data_type_t) {
       using ColumnDataType = typename decltype(data_type_t)::type;
       const auto value_segment = std::make_shared<ValueSegment<ColumnDataType>>();
@@ -56,7 +57,7 @@ void Table::create_new_chunk() {
 ColumnCount Table::column_count() const { return static_cast<ColumnCount>(_column_names.size()); }
 
 ChunkOffset Table::row_count() const {
-  auto row_number = 0;
+  auto row_number = ChunkOffset{0};
 
   for (const auto& chunk : _chunks) {
     row_number += chunk->size();
@@ -68,14 +69,11 @@ ChunkOffset Table::row_count() const {
 ChunkID Table::chunk_count() const { return static_cast<ChunkID>(_chunks.size()); }
 
 ColumnID Table::column_id_by_name(const std::string& column_name) const {
-  for (auto index = 0; index < column_count(); index++) {
-    if (_column_names[index] == column_name) {
-      return static_cast<ColumnID>(index);
-    }
-  }
+  const auto target_it = std::find(begin(_column_names), end(_column_names), column_name);
+  
+  Assert(target_it != _column_names.end(), "The requested column name does not exist inside the table!");
 
-  // If we reach here, the requested column name is non-existent.
-  throw std::invalid_argument{"The requested column name does not exist inside the table!"};
+  return static_cast<ColumnID>(target_it - _column_names.begin());
 }
 
 ChunkOffset Table::target_chunk_size() const { return _target_chunk_size; }
@@ -83,29 +81,19 @@ ChunkOffset Table::target_chunk_size() const { return _target_chunk_size; }
 const std::vector<std::string>& Table::column_names() const { return _column_names; }
 
 const std::string& Table::column_name(const ColumnID column_id) const {
-  DebugAssert(column_id < _column_names.size(),
-              "The requested column_id has no corresponding column inside the table!");
-
-  return _column_names[column_id];
+  return _column_names.at(column_id);
 }
 
 const std::string& Table::column_type(const ColumnID column_id) const {
-  DebugAssert(column_id < _column_types.size(),
-              "The requested column_id has no corresponding column inside the table!");
-
-  return _column_types[column_id];
+  return _column_types.at(column_id);
 }
 
 std::shared_ptr<Chunk> Table::get_chunk(ChunkID chunk_id) {
-  DebugAssert(chunk_id < _chunks.size(), "The requested chunk_id has no corresponding chunk inside the table!");
-
-  return _chunks[chunk_id];
+  return _chunks.at(chunk_id);
 }
 
 std::shared_ptr<const Chunk> Table::get_chunk(ChunkID chunk_id) const {
-  DebugAssert(chunk_id < _chunks.size(), "The requested chunk_id has no corresponding chunk inside the table!");
-
-  return _chunks[chunk_id];
+  return _chunks.at(chunk_id);
 }
 
 }  // namespace opossum

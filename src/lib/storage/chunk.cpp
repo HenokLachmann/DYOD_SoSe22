@@ -20,7 +20,8 @@ void Chunk::append(const std::vector<AllTypeVariant>& values) {
   DebugAssert(values.size() == column_count(),
               "The number of values doesn't match the number of columns in the chunk!");
 
-  for (auto index = 0; index < column_count(); index++) {
+  const auto num_cols = column_count();
+  for (auto index = 0; index < num_cols; index++) {
     _segments[index]->append(values[index]);
   }
 }
